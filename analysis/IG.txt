@@ -1,0 +1,23 @@
+
+model{
+  # Observed interventions 
+  for (i in 1:n){ # For each participant
+    for (j in 1:m){ # For each puzzle
+      node[i,j] ~ dcat(prob[i,j,1:3]) # Which node to choose
+      prob[i,j,1:3] <- exp_v[i,j,1:3] / sum(exp_v[i,j,1:3]) # Probability of choosing each node 
+      for (k in 1:3){ # The value of each node
+        exp_v[i,j,k] <- exp(V_IG[i,j,k]/tau[i])
+        }
+    }
+  }
+  # Prior(s) on parameter(s)
+  for (i in 1:n){
+    tau[i] ~ dgamma(sh, ra)
+  }
+  # Reparameterize shape and rate by mean and standard deviation
+  sh <- pow(mean,2) / pow(sd,2) # shape
+  ra <- mean / pow(sd,2) # rate
+  mean ~ dunif(0,100) # mean 
+  sd ~ dunif(0,100) # standard deviation 
+}
+
